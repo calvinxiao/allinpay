@@ -1,0 +1,28 @@
+printWidth: 80
+tabWidth: 2
+semi: true
+useTabs: false
+singleQuote: true
+bracketSpacing: true
+insertPragma: true
+requirePragma: false
+jsxBracketSameLine: false
+#parser: "flow"
+arrowParens: "always"
+trailingComma: "all"
+overrides:
+- files: "*.vue"
+  options:
+    jsxBracketSameLine: true
+    trailingComma: "es5"
+    requirePragma: false
+    insertPragma: false
+- files: "*.jxs"
+  options:
+    jsxBracketSameLine: true
+    trailingComma: "es5"
+    requirePragma: false
+    insertPragma: false
+- files: "*.md"
+  options:
+    parser: "markdown"
