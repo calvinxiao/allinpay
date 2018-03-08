@@ -21,7 +21,7 @@ class AllInPay {
         this.merchantId = merchantId;
         this.md5Key = md5Key;
 
-        // config默认值
+        // TODO config默认值
 
     }
 
@@ -64,18 +64,8 @@ class AllInPay {
             return data[field] ? data[field] : '';
         });
 
-        let toSign = '';
-        for (let i = 0; i < fields.length; i++) {
-            // 为防止非法篡改要求商户对请求内容进行签名，按第 3 小节中接口报文参数说明，
-            // 签名源串 是由除 signMsg 字段以外的所有非空字段内容按照报文字段的先后顺序
-            // 依次按照“字段名=字段 值”的方式用“&”符号连接。
-            // TODO 测试汉字
-            if (values[i]) {
-                toSign = fields[i]+'='+values[i] + '&';
-            }
-        }
-        toSign = toSign.substr(0, toSign.length - 1);
-        let signMsg = this.sign(originStr);
+        let toSign = this.concatString(fields, values);
+        let signMsg = this.getSignatuare(toSign);
         fields.push('signMsg');
         values.push(signMsg);
         return {
@@ -88,12 +78,44 @@ class AllInPay {
     /**
      * 获取一个支付单的信息
      */
-    async getOnePayOrder() { }
+    async getOnePayOrder(data) {
+        // 1. get result from rawRequest
+        // 2. convert result
+        let fields = [
+            'merchantId',
+            'version',
+            'signType',
+            'orderNo',
+            'orderDatetime',
+            'queryDatetime',
+        ];
+
+        let values = fields.map(field => {
+            return data[field] ? data[field] : '';
+        });
+        let toSign = this.concatString(fields, values);
+        let signMsg = this.getSignatuare(toSign);
+        fields.push('signMsg');
+        values.push(signMsg);
+        // TODO post
+        let result = await this.request(fields, values);
+
+        let obj = utils.convertSingleResult(result);
+        if (obj['ERRORCODE']) {
+            throw new Error(`ERRORCODE: ${obj.ERRORMSG}, ERRORMSG: ${obj.ERRORMSG}`)
+        }
+
+        
+    }
 
     /**
      * 获取支付单列表
      */
-    async getPayOrderList() { }
+    async getPayOrderList() { 
+        // 1. get result from rawRequest
+        // 2. validate data
+        
+    }
 
     /**
      * 验证签名
@@ -112,7 +134,21 @@ class AllInPay {
 
     }
 
-    sign(originStr) {
+    concatString(fields, values) {
+        let toSign = '';
+        for (let i = 0; i < fields.length; i++) {
+            // 为防止非法篡改要求商户对请求内容进行签名，按第 3 小节中接口报文参数说明，
+            // 签名源串 是由除 signMsg 字段以外的所有非空字段内容按照报文字段的先后顺序
+            // 依次按照“字段名=字段 值”的方式用“&”符号连接。
+            // TODO 测试汉字
+            if (values[i]) {
+                toSign = fields[i]+'='+values[i] + '&';
+            }
+        }
+        return toSign.substr(0, toSign.length - 1);
+    }
+
+    getSignatuare(originStr) {
         let signStr = originStr + `&key=${this.md5Key}`;
         return crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
     }
