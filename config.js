@@ -1,5 +1,5 @@
 module.exports = {
-    MAIN_REQUEST_URL='https://service.allinpay.com/gateway/index.do',
+    MAIN_REQUEST_URL: 'https://service.allinpay.com/gateway/index.do',
     INPUT_CHARSET: {
         UTF8: 1,
         GBK: 2,
@@ -27,4 +27,4 @@ module.exports = {
         CERTIFIED_PAY: 28, // 认证支付，TODO搞懂这个是什么鬼？
     }
 
-}
+};

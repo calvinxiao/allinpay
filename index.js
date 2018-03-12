@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const crypto = require('crypto');
 
 const config = require('./config');
 const utils = require('./utils');
@@ -61,9 +62,8 @@ class AllInPay {
             'tradeNature'
         ];
         let values = fields.map(field => {
-            return data[field] ? data[field] : '';
+            return data[field] !== undefined ? '' + data[field] : '';
         });
-
         let toSign = this.concatString(fields, values);
         let signMsg = this.getSignatuare(toSign);
         fields.push('signMsg');
@@ -72,7 +72,7 @@ class AllInPay {
             fields: fields,
             values: values,
             postUrl: config.MAIN_REQUEST_URL,
-        }
+        };
     }
 
     /**
@@ -102,30 +102,32 @@ class AllInPay {
 
         let obj = utils.convertSingleResult(result);
         if (obj['ERRORCODE']) {
-            throw new Error(`ERRORCODE: ${obj.ERRORMSG}, ERRORMSG: ${obj.ERRORMSG}`)
+            throw new Error(`ERRORCODE: ${obj.ERRORMSG}, ERRORMSG: ${obj.ERRORMSG}`);
         }
 
-        
+
     }
 
     /**
      * 获取支付单列表
      */
-    async getPayOrderList() { 
+    async getPayOrderList() {
         // 1. get result from rawRequest
         // 2. validate data
-        
+
     }
 
     /**
      * 验证签名
      */
-    async verifySignature() { }
+    async verifySignature() {
+    }
 
     /**
      * 退款， TODO 决定能不能自定义退款金额
      */
-    async refund() { }
+    async refund() {
+    }
 
     /**
      * 获取退款单状态
@@ -142,7 +144,7 @@ class AllInPay {
             // 依次按照“字段名=字段 值”的方式用“&”符号连接。
             // TODO 测试汉字
             if (values[i]) {
-                toSign = fields[i]+'='+values[i] + '&';
+                toSign += fields[i] + '=' + values[i] + '&';
             }
         }
         return toSign.substr(0, toSign.length - 1);
@@ -152,7 +154,6 @@ class AllInPay {
         let signStr = originStr + `&key=${this.md5Key}`;
         return crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
     }
-
 
 
 }
