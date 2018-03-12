@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const crypto = require('crypto');
+const request = require('request-promise');
 
 const config = require('./config');
 const utils = require('./utils');
@@ -93,7 +94,7 @@ class AllInPay {
         ];
 
         let values = fields.map(field => {
-            return data[field] ? data[field] : '';
+            return data[field] !== undefined ? '' + data[field] : '';
         });
         let toSign = this.concatString(fields, values);
         let signMsg = this.getSignatuare(toSign);
@@ -103,11 +104,10 @@ class AllInPay {
         let result = await this.request(fields, values);
 
         let obj = utils.convertSingleResult(result);
+        // 订单不存在：10027
         if (obj['ERRORCODE']) {
-            throw new Error(`ERRORCODE: ${obj.ERRORMSG}, ERRORMSG: ${obj.ERRORMSG}`);
+            throw new Error(`ERRORCODE: ${obj.ERRORCODE}, ERRORMSG: ${obj.ERRORMSG}`);
         }
-
-
     }
 
     /**
@@ -157,7 +157,16 @@ class AllInPay {
         return crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
     }
 
-
+    async request(fields, values) {
+        const form = {};
+        for (let i = 0; i < fields.length; i++) {
+            form[fields[i]] = values[i];
+        }
+        return await request.post({
+            uri: 'http://ceshi.allinpay.com/gateway/index.do',
+            form,
+        });
+    }
 }
 
 module.exports = AllInPay;

@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/calvinxiao/allinpay#readme",
   "dependencies": {
-    "lodash": "^4.17.5"
+    "lodash": "^4.17.5",
+    "request": "^2.84.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "mocha": "^5.0.4"
