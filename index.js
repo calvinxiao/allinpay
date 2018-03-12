@@ -4,6 +4,36 @@ const crypto = require('crypto');
 const config = require('./config');
 const utils = require('./utils');
 
+const payOrderFields = [
+    'inputCharset',
+    'pickupUrl',
+    'receiveUrl',
+    'version',
+    'language',
+    'signType',
+    'merchantId',
+    'payerName',
+    'payerEmail',
+    'payerTelephone',
+    'payerIDCard',
+    'pid',
+    'orderNo',
+    'orderAmount',
+    'orderCurrency',
+    'orderDatetime',
+    'orderExpireDatetime',
+    'productName',
+    'productPrice',
+    'productNum',
+    'productId',
+    'productDesc',
+    'ext1',
+    'ext2',
+    'payType',
+    'issuerId',
+    'pan',
+    'tradeNature'
+];
 class AllInPay {
     /**
      * @merchantId，商户id，必传
@@ -28,39 +58,11 @@ class AllInPay {
 
     /**
      * 创建支付单
+     * @param data form表单传送的对象key-value
+     * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
     async getPayOrderFormParameters(data) {
-
-        let fields = [
-            'inputCharset',
-            'pickupUrl',
-            'receiveUrl',
-            'version',
-            'language',
-            'signType',
-            'merchantId',
-            'payerName',
-            'payerEmail',
-            'payerTelephone',
-            'payerIDCard',
-            'pid',
-            'orderNo',
-            'orderAmount',
-            'orderCurrency',
-            'orderDatetime',
-            'orderExpireDatetime',
-            'productName',
-            'productPrice',
-            'productNum',
-            'productId',
-            'productDesc',
-            'ext1',
-            'ext2',
-            'payType',
-            'issuerId',
-            'pan',
-            'tradeNature'
-        ];
+        const fields = _.slice(payOrderFields, 0, payOrderFields.length);
         let values = fields.map(field => {
             return data[field] !== undefined ? '' + data[field] : '';
         });
