@@ -5,7 +5,20 @@ const request = require('request-promise');
 const config = require('./config');
 const utils = require('./utils');
 
-const payOrderFields = [
+/**
+ * 签名类型
+ * @type {{createOnePayOrder: number, getOnePayOrder: number, refundOnePayOrder: number}}
+ */
+const signType = {
+    createOnePayOrder: 0,
+    getOnePayOrder: 1,
+    refundOnePayOrder: 2,
+};
+/**
+ * 创建支付单可携带的字段
+ * @type {[*]}
+ */
+const createPayOrderFields = [
     'inputCharset',
     'pickupUrl',
     'receiveUrl',
@@ -35,6 +48,32 @@ const payOrderFields = [
     'pan',
     'tradeNature'
 ];
+/**
+ * 查询单个支付订单字段
+ * @type {[*]}
+ */
+const getOnePayOrderFields = [
+    'merchantId',
+    'version',
+    'signType',
+    'orderNo',
+    'orderDatetime',
+    'queryDatetime',
+];
+/**
+ * 申请单个订单退款可携带的字段
+ * @type {[*]}
+ */
+const refundOnePayOrderFields = [
+    'version',
+    'signType',
+    'merchantId',
+    'orderNo',
+    'refundAmount',
+    'mchtRefundOrderNo',
+    'orderDatetime',
+];
+
 class AllInPay {
     /**
      * @merchantId，商户id，必传
@@ -63,14 +102,7 @@ class AllInPay {
      * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
     async getPayOrderFormParameters(data) {
-        const fields = _.slice(payOrderFields, 0, payOrderFields.length);
-        let values = fields.map(field => {
-            return data[field] !== undefined ? '' + data[field] : '';
-        });
-        let toSign = this.concatString(fields, values);
-        let signMsg = this.getSignatuare(toSign);
-        fields.push('signMsg');
-        values.push(signMsg);
+        const {fields, values} = this.sign(data, signType.createOnePayOrder);
         return {
             fields: fields,
             values: values,
@@ -79,27 +111,15 @@ class AllInPay {
     }
 
     /**
-     * 获取一个支付单的信息
+     * 获取一个支付单的信息,只返回支付成功的订单
+     * @param data form object
+     * @returns {Promise.<void>}
      */
     async getOnePayOrder(data) {
         // 1. get result from rawRequest
         // 2. convert result
-        let fields = [
-            'merchantId',
-            'version',
-            'signType',
-            'orderNo',
-            'orderDatetime',
-            'queryDatetime',
-        ];
+        const {fields, values} = this.sign(data, signType.getOnePayOrder);
 
-        let values = fields.map(field => {
-            return data[field] !== undefined ? '' + data[field] : '';
-        });
-        let toSign = this.concatString(fields, values);
-        let signMsg = this.getSignatuare(toSign);
-        fields.push('signMsg');
-        values.push(signMsg);
         // TODO post
         let result = await this.request(fields, values);
 
@@ -128,7 +148,8 @@ class AllInPay {
     /**
      * 退款， TODO 决定能不能自定义退款金额
      */
-    async refund() {
+    async refundOnePayOrder(data) {
+
     }
 
     /**
@@ -136,6 +157,12 @@ class AllInPay {
      */
     async getRefundStatus() {
 
+    }
+
+    getValues(dataObj, fields) {
+        return fields.map(field => {
+            return dataObj[field] !== undefined ? ('' + dataObj[field]).trim() : '';
+        });
     }
 
     concatString(fields, values) {
@@ -157,6 +184,31 @@ class AllInPay {
         return crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
     }
 
+    sign(data, type) {
+        let fields;
+        switch (type) {
+            case signType.createOnePayOrder:
+                fields = _.slice(createPayOrderFields, 0, createPayOrderFields.length);
+                break;
+            case signType.getOnePayOrder:
+                fields = _.slice(getOnePayOrderFields, 0, getOnePayOrderFields.length);
+                break;
+            case signType.refundOnePayOrder:
+                fields = _.slice(refundOnePayOrderFields, 0, refundOnePayOrderFields.length);
+                break;
+        }
+        const values = this.getValues(data, fields);
+        const toSign = this.concatString(fields, values);
+        const signMsg = this.getSignatuare(toSign);
+        fields.push('signMsg');
+        values.push(signMsg);
+
+        return {
+            fields,
+            values
+        };
+    }
+
     async request(fields, values) {
         const form = {};
         for (let i = 0; i < fields.length; i++) {
@@ -167,6 +219,7 @@ class AllInPay {
             form,
         });
     }
+
 }
 
 module.exports = AllInPay;
