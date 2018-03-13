@@ -101,7 +101,7 @@ class AllInPay {
      * @param data form表单传送的对象key-value
      * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
-    async getPayOrderFormParameters(data) {
+    async createOnePayOrder(data) {
         const {fields, values} = this.sign(data, signType.createOnePayOrder);
         return {
             fields: fields,
@@ -120,10 +120,9 @@ class AllInPay {
         // 2. convert result
         const {fields, values} = this.sign(data, signType.getOnePayOrder);
 
-        // TODO post
-        let result = await this.request(fields, values);
+        const result = await this.request(fields, values);
 
-        let obj = utils.convertSingleResult(result);
+        const obj = utils.convertSingleResult(result);
         // 订单不存在：10027
         if (obj['ERRORCODE']) {
             throw new Error(`ERRORCODE: ${obj.ERRORCODE}, ERRORMSG: ${obj.ERRORMSG}`);
@@ -146,10 +145,17 @@ class AllInPay {
     }
 
     /**
-     * 退款， TODO 决定能不能自定义退款金额
+     * 申请单个订单退款
      */
     async refundOnePayOrder(data) {
+        const {fields, values} = this.sign(data, signType.refundOnePayOrder);
 
+        const result = await this.request(fields, values);
+
+        const obj = utils.convertSingleResult(result);
+        if (obj['ERRORCODE']) {
+            throw new Error(`ERRORCODE: ${obj.ERRORCODE}, ERRORMSG: ${obj.ERRORMSG}`);
+        }
     }
 
     /**
