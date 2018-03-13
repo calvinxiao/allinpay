@@ -4,7 +4,7 @@
 const assert = require('assert');
 const AllinPay = require('../index');
 
-const allinPay = new AllinPay('100020091218001', '1234567890', {isTest: true});
+const allinPay = new AllinPay('100020091218001', '1234567890', {isTest: true, signType: 0});
 describe('AllinPay', function () {
     const orderNo = 'NO20180313170123';
     const orderDatetime = 20180313190122;
@@ -71,6 +71,16 @@ describe('AllinPay', function () {
             orderNo: 20180313200130,
             orderDatetime: orderDatetime,
             queryDatetime: 20180313194722,
+        });
+        console.log(result);
+    });
+    it('申请单个订单退款，ok', async () => {
+        const result = await allinPay.refundOnePayOrder({
+            merchantId: '100020091218001',
+            orderNo: 20180313200132,
+            orderDatetime: orderDatetime,
+            refundAmount: 200000,
+            mchtRefundOrderNo: 20180313200130,
         });
         console.log(result);
     });

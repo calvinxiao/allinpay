@@ -92,10 +92,15 @@ class AllInPay {
 
         this.merchantId = merchantId;
         this.md5Key = md5Key;
+
         // config默认值
-        if (options.signType === 1) {
-            throw new Error(`暂不支持返回结果使用证书签名，signType仅支持0`);
+        options.isTest = !!options.isTest;
+
+        if (options.signType === 1 || options.signType === '1') {
+            throw new Error(`暂不支持此signType`);
         }
+        options.signType = 0;
+
         this.options = options;
     }
 
@@ -165,12 +170,13 @@ class AllInPay {
     async refundOnePayOrder(data) {
         const {fields, values} = this.sign(data, signOptions.refundOnePayOrder);
 
-        const result = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
+        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
 
-        const obj = utils.convertSingleResult(result);
-        if (obj['ERRORCODE']) {
-            throw new Error(`ERRORCODE: ${obj.ERRORCODE}, ERRORMSG: ${obj.ERRORMSG}`);
+        const result = utils.convertSingleResult(response);
+        if (result['ERRORCODE']) {
+            throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
+        return result;
     }
 
     /**
@@ -219,6 +225,8 @@ class AllInPay {
         const values = fields.map(field => {
             if (field === 'version') {
                 return version;
+            } else if (field === 'signType') {
+                return '' + this.options.signType;
             }
             return data[field] !== undefined ? ('' + data[field]).trim() : '';
         });
