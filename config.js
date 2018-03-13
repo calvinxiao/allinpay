@@ -1,5 +1,6 @@
 module.exports = {
-    MAIN_REQUEST_URL: 'https://service.allinpay.com/gateway/index.do',
+    MAIN_REQUEST_URL: 'http://ceshi.allinpay.com/gateway/index.do',
+// MAIN_REQUEST_URL: 'https://service.allinpay.com/gateway/index.do',
     INPUT_CHARSET: {
         UTF8: 1,
         GBK: 2,

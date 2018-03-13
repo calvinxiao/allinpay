@@ -97,17 +97,27 @@ class AllInPay {
     }
 
     /**
-     * 创建支付单
+     * 获取创建创建支付单所需参数
      * @param data form表单传送的对象key-value
      * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
-    async getOnePayOrderParameters(data) {
+    getOnePayOrderParameters(data) {
         const {fields, values} = this.sign(data, signType.createOnePayOrder);
         return {
             fields: fields,
             values: values,
             postUrl: config.MAIN_REQUEST_URL,
         };
+    }
+
+    /**
+     * 创建支付单
+     * @param data
+     * @returns {Promise.<*>}
+     */
+    async createOnePayOrder(data) {
+        const {fields, values} = this.getOnePayOrderParameters(data);
+        return await this.request(config.MAIN_REQUEST_URL, fields, values);
     }
 
     /**
@@ -120,7 +130,7 @@ class AllInPay {
         // 2. convert result
         const {fields, values} = this.sign(data, signType.getOnePayOrder);
 
-        const result = await this.request(fields, values);
+        const result = await this.request(config.MAIN_REQUEST_URL, fields, values);
 
         const obj = utils.convertSingleResult(result);
         // 订单不存在：10027
@@ -150,7 +160,7 @@ class AllInPay {
     async refundOnePayOrder(data) {
         const {fields, values} = this.sign(data, signType.refundOnePayOrder);
 
-        const result = await this.request(fields, values);
+        const result = await this.request(config.MAIN_REQUEST_URL, fields, values);
 
         const obj = utils.convertSingleResult(result);
         if (obj['ERRORCODE']) {
@@ -215,13 +225,13 @@ class AllInPay {
         };
     }
 
-    async request(fields, values) {
+    async request(url, fields, values) {
         const form = {};
         for (let i = 0; i < fields.length; i++) {
             form[fields[i]] = values[i];
         }
         return await request.post({
-            uri: 'http://ceshi.allinpay.com/gateway/index.do',
+            uri: url,
             form,
         });
     }

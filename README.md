@@ -6,14 +6,18 @@
 const allInPay = new AllInPay(merchantId, md5Key, {});
 ```
 
-### 创建支付订单 getPayOrderFormParameters
-
+### 获取创建支付单所需form参数 getOnePayOrderParameters
 ```
-let paymentFormData = allInPay.getPayOrderFormParameters(parameters);
+let paymentFormData = allInPay.getOnePayOrderParameters(parameters);
 // paymentFormData.fields = [] // form 的字段，按顺序放到表单
 // paymentFormData.values = [] // form 的值
 // paymentFormData.postUrl = '' // form post 到的url
 ```
+### 创建支付订单 createOnePayOrder
+```
+await allInPay.createOnePayOrder(formData)
+```
+
 
 ### 获取一个订单信息 getOnePayOrder
 
