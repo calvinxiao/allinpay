@@ -9,7 +9,7 @@ describe('AllinPay', function () {
     const orderNo = 'NO20180312170120';
     const orderDatetime = 20180312170120;
     it('创建新支付单，ok', async () => {
-        const result = await allinPay.createOnePayOrder({
+        const result = await allinPay.getOnePayOrderParameters({
             inputCharset: 1,
             pickupUrl: 'https://requestb.in/18nnvra1',
             reveiveUrl: 'https://requestb.in/18nnvra1',

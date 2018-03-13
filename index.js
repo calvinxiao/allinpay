@@ -101,7 +101,7 @@ class AllInPay {
      * @param data form表单传送的对象key-value
      * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
-    async createOnePayOrder(data) {
+    async getOnePayOrderParameters(data) {
         const {fields, values} = this.sign(data, signType.createOnePayOrder);
         return {
             fields: fields,
