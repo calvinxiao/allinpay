@@ -79,8 +79,9 @@ class AllInPay {
      * @merchantId，商户id，必传
      * @md5Key，计算签名的key，必传，
      * @options，可选参数
+     *          isTest  是否测试模式，测试模式请求只会发到通联测试服务器而不是线上环境
      */
-    constructor(merchantId, md5Key, options = {}) {
+    constructor(merchantId, md5Key, options = {isTest: false}) {
         if (_.isEmpty(merchantId)) {
             throw new Error('merchantId 不能为空');
         }
@@ -91,9 +92,8 @@ class AllInPay {
 
         this.merchantId = merchantId;
         this.md5Key = md5Key;
-
-        // TODO config默认值
-
+        // config默认值
+        this.isTest = options.isTest;
     }
 
     /**
@@ -106,7 +106,7 @@ class AllInPay {
         return {
             fields: fields,
             values: values,
-            postUrl: config.MAIN_REQUEST_URL,
+            postUrl: (this.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl,
         };
     }
 
@@ -117,7 +117,7 @@ class AllInPay {
      */
     async createOnePayOrder(data) {
         const {fields, values} = this.getOnePayOrderParameters(data);
-        return await this.request(config.MAIN_REQUEST_URL, fields, values);
+        return await this.request((this.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
     }
 
     /**
@@ -130,7 +130,7 @@ class AllInPay {
         // 2. convert result
         const {fields, values} = this.sign(data, signType.getOnePayOrder);
 
-        const result = await this.request(config.MAIN_REQUEST_URL, fields, values);
+        const result = await this.request((this.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
 
         const obj = utils.convertSingleResult(result);
         // 订单不存在：10027
@@ -160,7 +160,7 @@ class AllInPay {
     async refundOnePayOrder(data) {
         const {fields, values} = this.sign(data, signType.refundOnePayOrder);
 
-        const result = await this.request(config.MAIN_REQUEST_URL, fields, values);
+        const result = await this.request((this.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
 
         const obj = utils.convertSingleResult(result);
         if (obj['ERRORCODE']) {

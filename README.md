@@ -3,7 +3,9 @@
 ## API功能
 
 ```
-const allInPay = new AllInPay(merchantId, md5Key, {});
+const allInPay = new AllInPay(merchantId, md5Key, {
+    isTest: // 是否开启测试模式，默认false，测试模式下所有请求发至通联测试环境url
+});
 ```
 
 ### 获取创建支付单所需form参数 getOnePayOrderParameters

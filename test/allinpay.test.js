@@ -4,9 +4,9 @@
 const assert = require('assert');
 const AllinPay = require('../index');
 
-const allinPay = new AllinPay('100020091218001', '1234567890');
+const allinPay = new AllinPay('100020091218001', '1234567890', {isTest: true});
 describe('AllinPay', function () {
-    const orderNo = 'NO20180313170120';
+    const orderNo = 'NO20180313170121';
     const orderDatetime = 20180313140120;
     it('获取创建新支付单所需参数，ok', async () => {
         const result = await allinPay.getOnePayOrderParameters({
