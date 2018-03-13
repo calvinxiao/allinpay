@@ -6,10 +6,10 @@ const config = require('./config');
 const utils = require('./utils');
 
 /**
- * 签名类型
+ * 签名选项：签名用途
  * @type {{createOnePayOrder: number, getOnePayOrder: number, refundOnePayOrder: number}}
  */
-const signType = {
+const signOptions = {
     createOnePayOrder: 0,
     getOnePayOrder: 1,
     refundOnePayOrder: 2,
@@ -81,7 +81,7 @@ class AllInPay {
      * @options，可选参数
      *          isTest  是否测试模式，测试模式请求只会发到通联测试服务器而不是线上环境
      */
-    constructor(merchantId, md5Key, options = {isTest: false}) {
+    constructor(merchantId, md5Key, options = {isTest: false, signType: 0}) {
         if (_.isEmpty(merchantId)) {
             throw new Error('merchantId 不能为空');
         }
@@ -93,7 +93,10 @@ class AllInPay {
         this.merchantId = merchantId;
         this.md5Key = md5Key;
         // config默认值
-        this.isTest = options.isTest;
+        if (options.signType === 1) {
+            throw new Error(`暂不支持返回结果使用证书签名，signType仅支持0`);
+        }
+        this.options = options;
     }
 
     /**
@@ -102,11 +105,11 @@ class AllInPay {
      * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
     getOnePayOrderParameters(data) {
-        const {fields, values} = this.sign(data, signType.createOnePayOrder);
+        const {fields, values} = this.sign(data, signOptions.createOnePayOrder);
         return {
             fields: fields,
             values: values,
-            postUrl: (this.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl,
+            postUrl: (this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl,
         };
     }
 
@@ -117,7 +120,7 @@ class AllInPay {
      */
     async createOnePayOrder(data) {
         const {fields, values} = this.getOnePayOrderParameters(data);
-        return await this.request((this.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
+        return await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
     }
 
     /**
@@ -128,15 +131,16 @@ class AllInPay {
     async getOnePayOrder(data) {
         // 1. get result from rawRequest
         // 2. convert result
-        const {fields, values} = this.sign(data, signType.getOnePayOrder);
+        const {fields, values} = this.sign(data, signOptions.getOnePayOrder);
 
-        const result = await this.request((this.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
+        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
 
-        const obj = utils.convertSingleResult(result);
+        const result = utils.convertSingleResult(response);
         // 订单不存在：10027
-        if (obj['ERRORCODE']) {
-            throw new Error(`ERRORCODE: ${obj.ERRORCODE}, ERRORMSG: ${obj.ERRORMSG}`);
+        if (result['ERRORCODE']) {
+            throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
+        return result;
     }
 
     /**
@@ -152,15 +156,16 @@ class AllInPay {
      * 验证签名
      */
     async verifySignature() {
+
     }
 
     /**
      * 申请单个订单退款
      */
     async refundOnePayOrder(data) {
-        const {fields, values} = this.sign(data, signType.refundOnePayOrder);
+        const {fields, values} = this.sign(data, signOptions.refundOnePayOrder);
 
-        const result = await this.request((this.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
+        const result = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
 
         const obj = utils.convertSingleResult(result);
         if (obj['ERRORCODE']) {
@@ -173,12 +178,6 @@ class AllInPay {
      */
     async getRefundStatus() {
 
-    }
-
-    getValues(dataObj, fields) {
-        return fields.map(field => {
-            return dataObj[field] !== undefined ? ('' + dataObj[field]).trim() : '';
-        });
     }
 
     concatString(fields, values) {
@@ -202,18 +201,27 @@ class AllInPay {
 
     sign(data, type) {
         let fields;
+        let version;
         switch (type) {
-            case signType.createOnePayOrder:
+            case signOptions.createOnePayOrder:
                 fields = _.slice(createPayOrderFields, 0, createPayOrderFields.length);
+                version = 'v1.0';
                 break;
-            case signType.getOnePayOrder:
+            case signOptions.getOnePayOrder:
                 fields = _.slice(getOnePayOrderFields, 0, getOnePayOrderFields.length);
+                version = 'v1.5';
                 break;
-            case signType.refundOnePayOrder:
+            case signOptions.refundOnePayOrder:
                 fields = _.slice(refundOnePayOrderFields, 0, refundOnePayOrderFields.length);
+                version = 'v2.3';
                 break;
         }
-        const values = this.getValues(data, fields);
+        const values = fields.map(field => {
+            if (field === 'version') {
+                return version;
+            }
+            return data[field] !== undefined ? ('' + data[field]).trim() : '';
+        });
         const toSign = this.concatString(fields, values);
         const signMsg = this.getSignatuare(toSign);
         fields.push('signMsg');

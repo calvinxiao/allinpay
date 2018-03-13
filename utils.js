@@ -13,7 +13,9 @@ function convertSingleResult(stringResult) {
     let dict = {};
     for (let pair of list) {
         let kv = pair.split('=');
-        dict[kv[0]] = kv[1];
+        if (kv.length === 2) {
+            dict[kv[0]] = kv[1];
+        }
     }
     return dict;
 }
