@@ -300,7 +300,7 @@ class AllInPay {
 
         this.verifySignature(response, functions.getRefundStatus);
 
-        return result;
+        return result.results;
     }
 
     concatString(fields, values) {

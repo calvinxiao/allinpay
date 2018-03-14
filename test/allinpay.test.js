@@ -60,7 +60,7 @@ describe('AllinPay', function () {
     it('获取退款单状态，ok', async () => {
         const result = await allinPay.getRefundStatus({
             merchantId: '100020091218001',
-            orderNo: 20180313200132,
+            orderNo,
             orderDatetime: orderDatetime,
             refundAmount: 200000,
             mchtRefundOrderNo: 20180313200130,
