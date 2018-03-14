@@ -26,6 +26,7 @@ function convertArrayResult(stringResult, fields) {
         return this.convertSingleResult(stringResult);
     }
 
+    stringResult = decodeURI(stringResult);
     const rowStrs = stringResult.split('\r\n');
 
     const list = [];

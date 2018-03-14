@@ -6,14 +6,14 @@ const config = require('./config');
 const utils = require('./utils');
 
 /**
- * 签名选项：签名用途
+ * 功能列表
  * @type {{createOnePayOrder: number, getOnePayOrder: number, refundOnePayOrder: number}}
  */
-const signOptions = {
-    createOnePayOrder: 0,
-    getOnePayOrder: 1,
-    refundOnePayOrder: 2,
-    getRefundStatus: 3,
+const functions = {
+    createOnePayOrder: 'createOnePayOrder',
+    getOnePayOrder: 'getOnePayOrder',
+    refundOnePayOrder: 'refundOnePayOrder',
+    getRefundStatus: 'getRefundStatus',
 };
 
 /**
@@ -96,6 +96,25 @@ const reqParams = {
  * @type {{}}
  */
 const resParams = {
+    getOnePayOrder: [
+        'merchantId',
+        'version',
+        'language',
+        'signType',
+        'payType',
+        'issuerId',
+        'paymentOrderId',
+        'orderNo',
+        'orderDatetime',
+        'orderAmount',
+        'payDatetime',
+        'payAmount',
+        'ext1',
+        'ext2',
+        'payResult',
+        'errorCode',
+        'returnDatetime',
+    ],
     /**
      * 获取退款状态
      */
@@ -148,7 +167,7 @@ class AllInPay {
      * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
     getOnePayOrderParameters(data) {
-        const {fields, values} = this.sign(data, signOptions.createOnePayOrder);
+        const {fields, values} = this.sign(data, functions.createOnePayOrder);
         return {
             fields: fields,
             values: values,
@@ -174,9 +193,11 @@ class AllInPay {
     async getOnePayOrder(data) {
         // 1. get result from rawRequest
         // 2. convert result
-        const {fields, values} = this.sign(data, signOptions.getOnePayOrder);
+        const {fields, values} = this.sign(data, functions.getOnePayOrder);
 
         const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
+
+        // this.verifySignature(response, functions.getOnePayOrder);
 
         const result = utils.convertSingleResult(response);
         // 订单不存在：10027
@@ -198,15 +219,45 @@ class AllInPay {
     /**
      * 验证签名
      */
-    async verifySignature() {
+    verifySignature(stringResult, func) {
+        stringResult = decodeURI(stringResult);
 
+        let signMsg, signStr = '';
+        switch (func) {
+            case functions.getOnePayOrder:
+                const resultObj = utils.convertSingleResult(stringResult);
+
+                signMsg = resultObj.signMsg;
+                resParams[func].forEach((field) => {
+                    const value = resultObj[field];
+                    if (value) { // 空字段不参与验签
+                        signStr += `${field}=${value}&`;
+                    }
+                });
+                signStr += `key=${this.md5Key}`;
+
+                break;
+
+            case functions.getRefundStatus:
+                const arr = stringResult.split('\r\n');
+
+                signMsg = arr[arr.length - 1];
+                signStr = arr.slice(0, arr.length - 1).join('\r\n') + '|' + this.md5Key;
+
+                break;
+        }
+
+        const calcSign = crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
+        if (signMsg !== calcSign) {
+            throw new Error(`验签不通过`);
+        }
     }
 
     /**
      * 申请单个订单退款
      */
     async refundOnePayOrder(data) {
-        const {fields, values} = this.sign(data, signOptions.refundOnePayOrder);
+        const {fields, values} = this.sign(data, functions.refundOnePayOrder);
 
         const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
 
@@ -221,11 +272,13 @@ class AllInPay {
      * 获取退款单状态
      */
     async getRefundStatus(data) {
-        const {fields, values} = this.sign(data, signOptions.getRefundStatus);
+        const {fields, values} = this.sign(data, functions.getRefundStatus);
 
         const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).refundQueryUrl, fields, values);
 
-        const result = utils.convertArrayResult(response,reqParams.getRefundStatus);
+        this.verifySignature(response, functions.getRefundStatus);
+
+        const result = utils.convertArrayResult(response, reqParams.getRefundStatus);
         if (result['ERRORCODE']) {
             throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
@@ -251,23 +304,23 @@ class AllInPay {
         return crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
     }
 
-    sign(data, type) {
+    sign(data, func) {
         let fields;
         let version;
-        switch (type) {
-            case signOptions.createOnePayOrder:
+        switch (func) {
+            case functions.createOnePayOrder:
                 fields = _.slice(reqParams.createPayOrder, 0, reqParams.createPayOrder.length);
                 version = 'v1.0';
                 break;
-            case signOptions.getOnePayOrder:
+            case functions.getOnePayOrder:
                 fields = _.slice(reqParams.getOnePayOrder, 0, reqParams.getOnePayOrder.length);
                 version = 'v1.5';
                 break;
-            case signOptions.refundOnePayOrder:
+            case functions.refundOnePayOrder:
                 fields = _.slice(reqParams.refundOnePayOrder, 0, reqParams.refundOnePayOrder.length);
                 version = 'v2.3';
                 break;
-            case signOptions.getRefundStatus:
+            case functions.getRefundStatus:
                 fields = _.slice(reqParams.getRefundStatus, 0, reqParams.getRefundStatus.length);
                 version = 'v2.4';
         }

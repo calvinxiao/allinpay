@@ -36,10 +36,22 @@ let payOrder = await allInPay.getOnePayOrder(data);
 let refundResult = await allInPay.refundOnePayOrder(refundOrder);
 ```
 
-### 获取退款订单的状态 getRefundStatus
+### 获取退款单的状态 getRefundStatus
 
 ```
-let refundStatus = await allInPay.getRefundStatus(refundOrderNo);
+let result = await allInPay.getRefundStatus(data);
+console.log(result);
+/**
+{ results: 
+   [ { version: 'v2.4',
+       signType: '0',
+       merchantId: '100020091218001',
+       orderNo: '20180313200132',
+       refundAmount: '200000',
+       refundDatetime: '20180313083359',
+       mchtRefundOrderNo: '20180313200130' } ],
+  sign: '6831641D502EAA1139EAC7E185483174' }
+**/
 ```
 
 ### 验证签名

@@ -7,7 +7,7 @@ const AllinPay = require('../index');
 const allinPay = new AllinPay('100020091218001', '1234567890', {isTest: true, signType: 0});
 describe('AllinPay', function () {
     const orderNo = 'NO20180313170123';
-    const orderDatetime = 20180313190122;
+    const orderDatetime = 20180314150122;
     it('获取创建新支付单所需参数，ok', async () => {
         const result = await allinPay.getOnePayOrderParameters({
             inputCharset: 1,
@@ -67,8 +67,8 @@ describe('AllinPay', function () {
         const result = await allinPay.getOnePayOrder({
             merchantId: '100020091218001',
             version: 'v1.5',
-            signType: 1,
-            orderNo: 20180313200132,
+            signType: 0,
+            orderNo: 20180314200130,
             orderDatetime: orderDatetime,
             queryDatetime: 20180313194722,
         });
