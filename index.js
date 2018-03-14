@@ -96,6 +96,9 @@ const reqParams = {
  * @type {{}}
  */
 const resParams = {
+    /**
+     * 查询单笔支付单
+     */
     getOnePayOrder: [
         'merchantId',
         'version',
@@ -114,6 +117,22 @@ const resParams = {
         'payResult',
         'errorCode',
         'returnDatetime',
+    ],
+    /**
+     * 单笔订单申请退款
+     */
+    refundOnePayOrder: [
+        'merchantId',
+        'version',
+        'signType',
+        'orderNo',
+        'orderAmount',
+        'orderDatetime',
+        'refundAmount',
+        'refundDatetime',
+        'refundResult',
+        'mchtRefundOrderNo',
+        'returnDatetime'
     ],
     /**
      * 获取退款状态
@@ -187,13 +206,17 @@ class AllInPay {
 
         const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
 
-        this.verifySignature(response, functions.getOnePayOrder);
-
         const result = utils.convertSingleResult(response);
         // 订单不存在：10027
         if (result['ERRORCODE']) {
             throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
+
+        /**
+         * 验签放在最后，因为报错的情况下，不用验签
+         */
+        this.verifySignature(response, functions.getOnePayOrder);
+
         return result;
     }
 
@@ -215,6 +238,7 @@ class AllInPay {
         let signMsg, signStr = '';
         switch (func) {
             case functions.getOnePayOrder:
+            case functions.refundOnePayOrder:
                 const resultObj = utils.convertSingleResult(stringResult);
 
                 signMsg = resultObj.signMsg;
@@ -255,6 +279,9 @@ class AllInPay {
         if (result['ERRORCODE']) {
             throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
+
+        this.verifySignature(response, functions.refundOnePayOrder);
+
         return result;
     }
 
@@ -266,12 +293,13 @@ class AllInPay {
 
         const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).refundQueryUrl, fields, values);
 
-        this.verifySignature(response, functions.getRefundStatus);
-
         const result = utils.convertArrayResult(response, reqParams.getRefundStatus);
         if (result['ERRORCODE']) {
             throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
+
+        this.verifySignature(response, functions.getRefundStatus);
+
         return result;
     }
 
