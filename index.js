@@ -12,6 +12,7 @@ const utils = require('./utils');
 const functions = {
     createOnePayOrder: 'createOnePayOrder',
     getOnePayOrder: 'getOnePayOrder',
+    batchGetPayOrders: 'batchGetPayOrders',
     refundOnePayOrder: 'refundOnePayOrder',
     getRefundStatus: 'getRefundStatus',
 };
@@ -66,6 +67,17 @@ const reqParams = {
         'queryDatetime',
     ],
     /**
+     * 批量查询支付单
+     */
+    batchGetPayOrders: [
+        'version',
+        'merchantId',
+        'beginDatetime',
+        'endDatetime',
+        'pageNo',
+        'signType',
+    ],
+    /**
      * 申请单个订单退款
      */
     refundOnePayOrder: [
@@ -118,6 +130,10 @@ const resParams = {
         'errorCode',
         'returnDatetime',
     ],
+    /**
+     * 批量查询支付订单
+     */
+    batchGetPayOrders: [],
     /**
      * 单笔订单申请退款
      */
@@ -190,7 +206,7 @@ class AllInPay {
         return {
             fields: fields,
             values: values,
-            postUrl: (this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl,
+            postUrl: (this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest,
         };
     }
 
@@ -204,7 +220,7 @@ class AllInPay {
         // 2. convert result
         const {fields, values} = this.sign(data, functions.getOnePayOrder);
 
-        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
+        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest, fields, values);
 
         const result = utils.convertSingleResult(response);
         // 订单不存在：10027
@@ -223,9 +239,23 @@ class AllInPay {
     /**
      * 获取支付单列表
      */
-    async getPayOrderList() {
-        // 1. get result from rawRequest
-        // 2. validate data
+    async batchGetPayOrders(data) {
+        const {fields, values} = this.sign(data, functions.batchGetPayOrders);
+
+        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).batchQuery, fields, values);
+
+        const result = utils.convertArrayResult(response, reqParams.batchGetPayOrders);
+
+        if (result['ERRORCODE']) {
+            throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
+        }
+
+        /**
+         * 验签放在最后，因为报错的情况下，不用验签
+         */
+        // this.verifySignature(response, functions.batchGetPayOrders);
+
+        return result;
 
     }
 
@@ -252,6 +282,7 @@ class AllInPay {
 
                 break;
 
+            case functions.batchGetPayOrders:
             case functions.getRefundStatus:
                 const arr = stringResult.split('\r\n');
 
@@ -273,7 +304,7 @@ class AllInPay {
     async refundOnePayOrder(data) {
         const {fields, values} = this.sign(data, functions.refundOnePayOrder);
 
-        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
+        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest, fields, values);
 
         const result = utils.convertSingleResult(response);
         if (result['ERRORCODE']) {
@@ -291,7 +322,7 @@ class AllInPay {
     async getRefundStatus(data) {
         const {fields, values} = this.sign(data, functions.getRefundStatus);
 
-        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).refundQueryUrl, fields, values);
+        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).refundQuery, fields, values);
 
         const result = utils.convertArrayResult(response, reqParams.getRefundStatus);
         if (result['ERRORCODE']) {
@@ -334,6 +365,10 @@ class AllInPay {
                 fields = _.slice(reqParams.getOnePayOrder, 0, reqParams.getOnePayOrder.length);
                 version = 'v1.5';
                 break;
+            case functions.batchGetPayOrders:
+                fields = _.slice(reqParams.batchGetPayOrders, 0, reqParams.batchGetPayOrders.length);
+                version = 'v1.6';
+                break;
             case functions.refundOnePayOrder:
                 fields = _.slice(reqParams.refundOnePayOrder, 0, reqParams.refundOnePayOrder.length);
                 version = 'v2.3';
@@ -347,7 +382,8 @@ class AllInPay {
                 case 'merchantId':
                     return this.merchantId;
                 case 'signType':
-                    return this.options.signType;
+                    // return this.options.signType;
+                    return '1';
                 case 'version':
                     return version;
                 default:

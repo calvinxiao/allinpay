@@ -3,15 +3,17 @@ module.exports = {
      * 通联生产环境url
      */
     PRODUCT_URL: {
-        mainRequestUrl: 'https://service.allinpay.com/gateway/index.do',
-        refundQueryUrl: 'https://service.allinpay.com/mchtoq/refundQuery',
+        mainRequest: 'https://service.allinpay.com/gateway/index.do',
+        batchQuery: 'https://service.allinpay.com/mchtoq/index.do',
+        refundQuery: 'https://service.allinpay.com/mchtoq/refundQuery',
     },
     /**
      * 通联测试环境url
      */
     TEST_URL: {
-        mainRequestUrl: 'http://ceshi.allinpay.com/gateway/index.do',
-        refundQueryUrl: 'http://ceshi.allinpay.com/mchtoq/refundQuery',
+        mainRequest: 'http://ceshi.allinpay.com/gateway/index.do',
+        batchQuery: 'http://ceshi.allinpay.com/mchtoq/index.do',
+        refundQuery: 'http://ceshi.allinpay.com/mchtoq/refundQuery',
     },
     INPUT_CHARSET: {
         UTF8: 1,

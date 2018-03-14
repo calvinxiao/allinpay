@@ -47,6 +47,14 @@ describe('AllinPay', function () {
         });
         console.log(result);
     });
+    it('查询支付单列表，ok', async () => {
+        const result = await allinPay.batchGetPayOrders({
+            beginDatetime: 20180301301,
+            endDatetime: 2018031323,
+            pageNo: 1
+        });
+        console.log(result);
+    }).timeout(5000000);
     it('申请单个订单退款，ok', async () => {
         const result = await allinPay.refundOnePayOrder({
             merchantId: '100020091218001',
