@@ -54,12 +54,6 @@ console.log(result);
 **/
 ```
 
-### 验证签名
-
-```
-let isVerified = allInPay.verifySignature(data);
-```
-
 
 ### 提现（帐号支付）transfer
 

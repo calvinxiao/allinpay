@@ -220,7 +220,7 @@ class AllInPay {
         // 2. convert result
         const {fields, values} = this.sign(data, functions.getOnePayOrder);
 
-        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest, fields, values);
+        const response = await this._request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest, fields, values);
 
         const result = utils.convertSingleResult(response);
         // 订单不存在：10027
@@ -242,7 +242,7 @@ class AllInPay {
     async batchGetPayOrders(data) {
         const {fields, values} = this.sign(data, functions.batchGetPayOrders);
 
-        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).batchQuery, fields, values);
+        const response = await this._request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).batchQuery, fields, values);
 
         const result = utils.convertArrayResult(response, reqParams.batchGetPayOrders);
 
@@ -304,7 +304,7 @@ class AllInPay {
     async refundOnePayOrder(data) {
         const {fields, values} = this.sign(data, functions.refundOnePayOrder);
 
-        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest, fields, values);
+        const response = await this._request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest, fields, values);
 
         const result = utils.convertSingleResult(response);
         if (result['ERRORCODE']) {
@@ -322,7 +322,7 @@ class AllInPay {
     async getRefundStatus(data) {
         const {fields, values} = this.sign(data, functions.getRefundStatus);
 
-        const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).refundQuery, fields, values);
+        const response = await this._request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).refundQuery, fields, values);
 
         const result = utils.convertArrayResult(response, reqParams.getRefundStatus);
         if (result['ERRORCODE']) {
@@ -334,7 +334,7 @@ class AllInPay {
         return result.results;
     }
 
-    concatString(fields, values) {
+    _concatString(fields, values) {
         let toSign = '';
         for (let i = 0; i < fields.length; i++) {
             // 为防止非法篡改要求商户对请求内容进行签名，按第 3 小节中接口报文参数说明，
@@ -348,7 +348,7 @@ class AllInPay {
         return toSign.substr(0, toSign.length - 1);
     }
 
-    getSignatuare(originStr) {
+    _getSignatuare(originStr) {
         let signStr = originStr + `&key=${this.md5Key}`;
         return crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
     }
@@ -382,16 +382,15 @@ class AllInPay {
                 case 'merchantId':
                     return this.merchantId;
                 case 'signType':
-                    // return this.options.signType;
-                    return '1';
+                    return this.options.signType;
                 case 'version':
                     return version;
                 default:
                     return data[field] !== undefined ? ('' + data[field]).trim() : '';
             }
         });
-        const toSign = this.concatString(fields, values);
-        const signMsg = this.getSignatuare(toSign);
+        const toSign = this._concatString(fields, values);
+        const signMsg = this._getSignatuare(toSign);
         fields.push('signMsg');
         values.push(signMsg);
 
@@ -401,7 +400,7 @@ class AllInPay {
         };
     }
 
-    async request(url, fields, values) {
+    async _request(url, fields, values) {
         const form = {};
         for (let i = 0; i < fields.length; i++) {
             form[fields[i]] = values[i];
