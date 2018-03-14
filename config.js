@@ -4,12 +4,14 @@ module.exports = {
      */
     PRODUCT_URL: {
         mainRequestUrl: 'https://service.allinpay.com/gateway/index.do',
+        refundQueryUrl: 'https://service.allinpay.com/mchtoq/refundQuery',
     },
     /**
      * 通联测试环境url
      */
     TEST_URL: {
         mainRequestUrl: 'http://ceshi.allinpay.com/gateway/index.do',
+        refundQueryUrl: 'http://ceshi.allinpay.com/mchtoq/refundQuery',
     },
     INPUT_CHARSET: {
         UTF8: 1,

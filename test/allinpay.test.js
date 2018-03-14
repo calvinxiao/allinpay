@@ -68,7 +68,7 @@ describe('AllinPay', function () {
             merchantId: '100020091218001',
             version: 'v1.5',
             signType: 1,
-            orderNo: 20180313200130,
+            orderNo: 20180313200132,
             orderDatetime: orderDatetime,
             queryDatetime: 20180313194722,
         });
@@ -76,6 +76,16 @@ describe('AllinPay', function () {
     });
     it('申请单个订单退款，ok', async () => {
         const result = await allinPay.refundOnePayOrder({
+            merchantId: '100020091218001',
+            orderNo: 20180313200132,
+            orderDatetime: orderDatetime,
+            refundAmount: 200000,
+            mchtRefundOrderNo: 20180313200130,
+        });
+        console.log(result);
+    });
+    it('获取退款单状态，ok', async () => {
+        const result = await allinPay.getRefundStatus({
             merchantId: '100020091218001',
             orderNo: 20180313200132,
             orderDatetime: orderDatetime,

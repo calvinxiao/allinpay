@@ -1,6 +1,7 @@
 module.exports = {
     encryptMd5,
-    convertSingleResult
+    convertSingleResult,
+    convertArrayResult
 };
 
 function encryptMd5() {
@@ -18,4 +19,34 @@ function convertSingleResult(stringResult) {
         }
     }
     return dict;
+}
+
+function convertArrayResult(stringResult, fields) {
+    if (stringResult.includes('ERRORCODE')) {
+        return this.convertSingleResult(stringResult);
+    }
+
+    const rowStrs = stringResult.split('\r\n');
+
+    const list = [];
+    let sign;
+    for (let rowStr of rowStrs) {
+        const obj = {};
+        const values = rowStr.split('|');
+
+        if (values.length === 1 && values[0]) {
+            sign = values[0];
+            break; // 签名放在最后，读到后直接break，忽略后面数据
+        } else {
+            for (let i = 0; i < fields.length; i++) {
+                obj[fields[i]] = values[i];
+            }
+            list.push(obj);
+        }
+    }
+
+    return {
+        results: list,
+        sign
+    };
 }

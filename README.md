@@ -5,7 +5,10 @@
 ```
 const allInPay = new AllInPay(merchantId, md5Key, {
     isTest: // 是否开启测试模式，默认false，测试模式下所有请求发至通联测试环境url
+    signType: // 目前只支持0
 });
+
+以后的调用中都不需要传merchantId、signType、version参数
 ```
 
 ### 获取创建支付单所需form参数 getOnePayOrderParameters
@@ -24,20 +27,13 @@ await allInPay.createOnePayOrder(formData)
 ### 获取一个订单信息 getOnePayOrder
 
 ```
-let payOrder = await allInPay.getOnePayOrder(orderNo);
+let payOrder = await allInPay.getOnePayOrder(data);
 ```
 
-### 批量获取订单信息 getPayOrderList
+### 单笔订单退款 refundOnePayOrder
 
 ```
-let payOrder = await allInPay.getPayOrderList(options);
-
-```
-
-### 订单退款 refund
-
-```
-let refundResult = await allInPay.refund(refundOrder);
+let refundResult = await allInPay.refundOnePayOrder(refundOrder);
 ```
 
 ### 获取退款订单的状态 getRefundStatus
