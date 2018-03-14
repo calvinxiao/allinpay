@@ -36,33 +36,6 @@ describe('AllinPay', function () {
         });
         console.log(result);
     });
-    it('创建支付单,ok', async () => {
-        const result = await allinPay.createOnePayOrder({
-            inputCharset: 1,
-            pickupUrl: 'https://requestb.in/18nnvra1',
-            reveiveUrl: 'https://requestb.in/18nnvra1',
-            language: 1,
-            version: 'v1.0',
-            signType: 1,
-            merchantId: '100020091218001',
-            payerName: '友好速搭',
-            payerEmail: 'hj@youhaosuda.com',
-            payerTelephone: 13700000000,
-            orderNo: orderNo,
-            orderAmount: 200,
-            orderCurrency: 0,
-            orderDatetime: orderDatetime,
-            productName: '笔记本电脑',
-            productPrice: 100,
-            productNum: 1,
-            productId: 'P1005001',
-            productDesc: '商品描述',
-            ext1: '附加参数',
-            ext2: '附加参数2',
-            payType: 0,
-        });
-        console.log(result);
-    });
     it('查询一个支付单，ok', async () => {
         const result = await allinPay.getOnePayOrder({
             merchantId: '100020091218001',

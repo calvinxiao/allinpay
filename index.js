@@ -176,16 +176,6 @@ class AllInPay {
     }
 
     /**
-     * 创建支付单
-     * @param data
-     * @returns {Promise.<*>}
-     */
-    async createOnePayOrder(data) {
-        const {fields, values} = this.getOnePayOrderParameters(data);
-        return await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
-    }
-
-    /**
      * 获取一个支付单的信息,只返回支付成功的订单
      * @param data form object
      * @returns {Promise.<void>}
@@ -197,7 +187,7 @@ class AllInPay {
 
         const response = await this.request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequestUrl, fields, values);
 
-        // this.verifySignature(response, functions.getOnePayOrder);
+        this.verifySignature(response, functions.getOnePayOrder);
 
         const result = utils.convertSingleResult(response);
         // 订单不存在：10027
