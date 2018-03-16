@@ -169,7 +169,7 @@ const resParams = {
 /**
  * 网关支付API
  */
-class AllInPay {
+class GatewayPay {
     /**
      * @merchantId，商户id，必传
      * @md5Key，计算签名的key，必传，
@@ -417,4 +417,4 @@ class AllInPay {
 
 }
 
-module.exports = AllInPay;
+module.exports = GatewayPay;
