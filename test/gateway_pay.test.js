@@ -4,12 +4,12 @@
 const assert = require('assert');
 const AllinPay = require('../index');
 
-const allinPay = new AllinPay('100020091218001', '1234567890', {isTest: true, signType: 0});
+const gatewayPay = new AllinPay.GatewayPay('100020091218001', '1234567890', {isTest: true, signType: 0});
 describe('AllinPay', function () {
     const orderNo = 20180314200130;
     const orderDatetime = 20180314150122;
     it('获取创建新支付单所需参数，ok', async () => {
-        const result = await allinPay.getOnePayOrderParameters({
+        const result = await gatewayPay.getOnePayOrderParameters({
             inputCharset: 1,
             pickupUrl: 'https://requestb.in/18nnvra1',
             reveiveUrl: 'https://requestb.in/18nnvra1',
@@ -37,7 +37,7 @@ describe('AllinPay', function () {
         console.log(result);
     });
     it('查询一个支付单，ok', async () => {
-        const result = await allinPay.getOnePayOrder({
+        const result = await gatewayPay.getOnePayOrder({
             merchantId: '100020091218001',
             version: 'v1.5',
             signType: 0,
@@ -48,7 +48,7 @@ describe('AllinPay', function () {
         console.log(result);
     });
     it('查询支付单列表，ok', async () => {
-        const result = await allinPay.batchGetPayOrders({
+        const result = await gatewayPay.batchGetPayOrders({
             beginDatetime: 20180301301,
             endDatetime: 2018031323,
             pageNo: 1
@@ -56,7 +56,7 @@ describe('AllinPay', function () {
         console.log(result);
     }).timeout(5000000);
     it('申请单个订单退款，ok', async () => {
-        const result = await allinPay.refundOnePayOrder({
+        const result = await gatewayPay.refundOnePayOrder({
             merchantId: '100020091218001',
             orderNo,
             orderDatetime: orderDatetime,
@@ -66,7 +66,7 @@ describe('AllinPay', function () {
         console.log(result);
     });
     it('获取退款单状态，ok', async () => {
-        const result = await allinPay.getRefundStatus({
+        const result = await gatewayPay.getRefundStatus({
             merchantId: '100020091218001',
             orderNo,
             orderDatetime: orderDatetime,

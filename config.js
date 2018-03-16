@@ -3,9 +3,12 @@ module.exports = {
      * 通联生产环境url
      */
     PRODUCT_URL: {
+        // 网关支付
         mainRequest: 'https://service.allinpay.com/gateway/index.do',
         batchQuery: 'https://service.allinpay.com/mchtoq/index.do',
         refundQuery: 'https://service.allinpay.com/mchtoq/refundQuery',
+        // 账户支付
+        accountPay: 'https://tlt.allinpay.com/aipg/ProcessServlet',
     },
     /**
      * 通联测试环境url
@@ -14,6 +17,8 @@ module.exports = {
         mainRequest: 'http://ceshi.allinpay.com/gateway/index.do',
         batchQuery: 'http://ceshi.allinpay.com/mchtoq/index.do',
         refundQuery: 'http://ceshi.allinpay.com/mchtoq/refundQuery',
+
+        accountPay: 'https://113.108.182.3/aipg/ProcessServlet',
     },
     INPUT_CHARSET: {
         UTF8: 1,
