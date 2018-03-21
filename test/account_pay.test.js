@@ -10,7 +10,7 @@ const accountPay = new AccountPay('200604000003628', fs.readFileSync(__dirname +
 describe('账户支付', function () {
     it('代付，ok', async () => {
         const result = await accountPay.pay({
-            REQ_SN: '2006040000036281',
+            REQ_SN: '20060400000362813',
         }, {
             BUSINESS_CODE: '09100',
             SUBMIT_TIME: '20180315132200',

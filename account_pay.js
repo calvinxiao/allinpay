@@ -7,6 +7,7 @@ const _ = require('lodash');
 const request = require('request');
 const crypto = require('crypto');
 const iconv = require('iconv-lite');
+const sign = crypto.createSign('RSA-SHA1');
 
 class AccountPay {
 
@@ -44,19 +45,19 @@ class AccountPay {
                 }
             }
         };
-        _.defaults(obj.AIPG.INFO, info, {LEVEL: 0,});
+        _.defaults(obj.AIPG.INFO, info);
         _.defaults(obj.AIPG.TRANS, trans);
-        let originStr = xml.builder.buildObject(obj);
-        originStr = iconv.encode(originStr, 'gbk');
+        const originStr = xml.builder.buildObject(obj);
+        const originStrBuffer = iconv.encode(originStr, 'gbk');
 
         // sign
-        const sign = crypto.createSign('RSA-SHA1');
-        sign.update(originStr);
+        sign.write(originStrBuffer);
+        sign.end();
         const signature = sign.sign({key: this.privateCert, passphrase: this.certPassphrase}, 'hex');
         obj.AIPG.INFO.SIGNED_MSG = signature;
 
-        let signedXml = xml.builder.buildObject(obj);
-        signedXml = iconv.encode(signedXml, 'gbk');
+        const signedXml = xml.builder.buildObject(obj);
+        const signedXmlBuffer = iconv.encode(signedXml, 'gbk');
 
         const resStr = await (new Promise((resolve, reject) => {
             const resStream = request.post({
@@ -64,7 +65,7 @@ class AccountPay {
                 headers: {
                     'Content-Type': 'application/xml'
                 },
-                body: signedXml,
+                body: signedXmlBuffer,
                 rejectUnauthorized: false
             });
             const decodeStream = iconv.decodeStream('gbk');
@@ -80,28 +81,6 @@ class AccountPay {
             });
         }));
 
-        let str = resStr;
-        let head = str.slice(0, str.indexOf('<SIGNED_MSG>'));
-        let tail = str.slice(str.indexOf('</SIGNED_MSG>') + 16);
-        str = head + tail;
-        console.log(str);
-        const clist = [
-            'RSA-SHA',
-            'RSA-SHA1',
-            'RSA-SHA1-2',
-            'RSA-SHA224',
-            'RSA-SHA256',
-            'RSA-SHA384',
-            'RSA-SHA512',
-            'sha1WithRSAEncryption',
-            'sha256',
-            'sha256WithRSAEncryption'];
-        for (let suit of clist) {
-            let s = crypto.createSign(suit);
-            s.update(iconv.encode(str, 'gbk'));
-            console.log(suit, '\t', s.sign(this.privateCert, 'hex'));
-        }
-        // console.log('rawreturn: ', resStr);
         const resJSON = await xml.parser.parseStringAsync(resStr);
         return resJSON;
     }
