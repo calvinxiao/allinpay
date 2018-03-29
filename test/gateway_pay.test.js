@@ -14,9 +14,6 @@ describe('AllinPay', function () {
             pickupUrl: 'https://requestb.in/18nnvra1',
             reveiveUrl: 'https://requestb.in/18nnvra1',
             language: 1,
-            version: 'v1.0',
-            signType: 1,
-            merchantId: '100020091218001',
             payerName: '苗翠花',
             payerEmail: 'miaoch@allinpay.com',
             payerTelephone: 13700000000,
@@ -38,9 +35,6 @@ describe('AllinPay', function () {
     });
     it('查询一个支付单，ok', async () => {
         const result = await gatewayPay.getOnePayOrder({
-            merchantId: '100020091218001',
-            version: 'v1.5',
-            signType: 0,
             orderNo,
             orderDatetime,
             queryDatetime: 20180313194722,
@@ -57,17 +51,15 @@ describe('AllinPay', function () {
     }).timeout(5000000);
     it('申请单个订单退款，ok', async () => {
         const result = await gatewayPay.refundOnePayOrder({
-            merchantId: '100020091218001',
             orderNo,
             orderDatetime: orderDatetime,
-            refundAmount: 200000,
-            mchtRefundOrderNo: 20180313200132,
+            refundAmount: 20,
+            mchtRefundOrderNo: 201803132001321,
         });
         console.log(result);
     });
     it('获取退款单状态，ok', async () => {
         const result = await gatewayPay.getRefundStatus({
-            merchantId: '100020091218001',
             orderNo,
             orderDatetime: orderDatetime,
             refundAmount: 200000,

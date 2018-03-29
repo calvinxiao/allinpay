@@ -6,18 +6,6 @@ const config = require('./config');
 const utils = require('./utils');
 
 /**
- * 功能列表
- * @type {{createOnePayOrder: number, getOnePayOrder: number, refundOnePayOrder: number}}
- */
-const functions = {
-    createOnePayOrder: 'createOnePayOrder',
-    getOnePayOrder: 'getOnePayOrder',
-    batchGetPayOrders: 'batchGetPayOrders',
-    refundOnePayOrder: 'refundOnePayOrder',
-    getRefundStatus: 'getRefundStatus',
-};
-
-/**
  * 请求携带参数
  * @type {{createPayOrder: [*], getOnePayOrder: [*], refundOnePayOrder: [*], refundQuery: Array}}
  */
@@ -163,6 +151,28 @@ const resParams = {
         'mchtRefundOrderNo',
         'refundResult',
         'returnDatetime',
+    ],
+    /**
+     * 支付回调
+     */
+    payCallback: [
+      'merchantId',
+      'version',
+      'language',
+      'signType',
+      'payType',
+      'issuerId',
+      'paymentOrderId',
+      'orderNo',
+      'orderDatetime',
+      'orderAmount',
+      'payDatetime',
+      'payAmount',
+      'ext1',
+      'ext1',
+      'payResult',
+      'errorCode',
+      'returnDatetime',
     ]
 };
 
@@ -170,6 +180,7 @@ const resParams = {
  * 网关支付API
  */
 class GatewayPay {
+
     /**
      * @merchantId，商户id，必传
      * @md5Key，计算签名的key，必传，
@@ -198,6 +209,18 @@ class GatewayPay {
         options.signType = '0';
 
         this.options = options;
+        /**
+         * 功能列表
+         * @type {{createOnePayOrder: number, getOnePayOrder: number, refundOnePayOrder: number}}
+         */
+        this.functions = {
+            createOnePayOrder: 'createOnePayOrder', // 获取创建支付单参数
+            getOnePayOrder: 'getOnePayOrder', // 查询一个支付单
+            batchGetPayOrders: 'batchGetPayOrders', // 批量查询支付单
+            refundOnePayOrder: 'refundOnePayOrder', // 退款单个支付单
+            getRefundStatus: 'getRefundStatus', // 获得退款状态
+            payCallback: 'payCallback', // 支付回调
+        };
     }
 
     /**
@@ -206,7 +229,7 @@ class GatewayPay {
      * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
     getOnePayOrderParameters(data) {
-        const {fields, values} = this.sign(data, functions.createOnePayOrder);
+        const {fields, values} = this.sign(data, GatewayPay.functions.createOnePayOrder);
         return {
             fields: fields,
             values: values,
@@ -222,7 +245,7 @@ class GatewayPay {
     async getOnePayOrder(data) {
         // 1. get result from rawRequest
         // 2. convert result
-        const {fields, values} = this.sign(data, functions.getOnePayOrder);
+        const {fields, values} = this.sign(data, this.functions.getOnePayOrder);
 
         const response = await this._request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest, fields, values);
 
@@ -235,16 +258,17 @@ class GatewayPay {
         /**
          * 验签放在最后，因为报错的情况下，不用验签
          */
-        this.verifySignature(response, functions.getOnePayOrder);
+        this.verifySignature(response, this.functions.getOnePayOrder);
 
         return result;
     }
 
     /**
      * 获取支付单列表
+     * TODO
      */
     async batchGetPayOrders(data) {
-        const {fields, values} = this.sign(data, functions.batchGetPayOrders);
+        const {fields, values} = this.sign(data, this.functions.batchGetPayOrders);
 
         const response = await this._request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).batchQuery, fields, values);
 
@@ -257,7 +281,7 @@ class GatewayPay {
         /**
          * 验签放在最后，因为报错的情况下，不用验签
          */
-        // this.verifySignature(response, functions.batchGetPayOrders);
+        // this.verifySignature(response, this.functions.batchGetPayOrders);
 
         return result;
 
@@ -271,8 +295,9 @@ class GatewayPay {
 
         let signMsg, signStr = '';
         switch (func) {
-            case functions.getOnePayOrder:
-            case functions.refundOnePayOrder:
+            case this.functions.getOnePayOrder:
+            case this.functions.refundOnePayOrder:
+            case this.functions.payCallback:
                 const resultObj = utils.convertSingleResult(stringResult);
 
                 signMsg = resultObj.signMsg;
@@ -286,8 +311,8 @@ class GatewayPay {
 
                 break;
 
-            case functions.batchGetPayOrders:
-            case functions.getRefundStatus:
+            case this.functions.batchGetPayOrders:
+            case this.functions.getRefundStatus:
                 const arr = stringResult.split('\r\n');
 
                 signMsg = arr[arr.length - 1];
@@ -306,7 +331,7 @@ class GatewayPay {
      * 申请单个订单退款
      */
     async refundOnePayOrder(data) {
-        const {fields, values} = this.sign(data, functions.refundOnePayOrder);
+        const {fields, values} = this.sign(data, this.functions.refundOnePayOrder);
 
         const response = await this._request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).mainRequest, fields, values);
 
@@ -315,7 +340,7 @@ class GatewayPay {
             throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
 
-        this.verifySignature(response, functions.refundOnePayOrder);
+        this.verifySignature(response, this.functions.refundOnePayOrder);
 
         return result;
     }
@@ -324,7 +349,7 @@ class GatewayPay {
      * 获取退款单状态
      */
     async getRefundStatus(data) {
-        const {fields, values} = this.sign(data, functions.getRefundStatus);
+        const {fields, values} = this.sign(data, this.functions.getRefundStatus);
 
         const response = await this._request((this.options.isTest ? config.TEST_URL : config.PRODUCT_URL).refundQuery, fields, values);
 
@@ -333,7 +358,7 @@ class GatewayPay {
             throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
 
-        this.verifySignature(response, functions.getRefundStatus);
+        this.verifySignature(response, this.functions.getRefundStatus);
 
         return result.results;
     }
@@ -361,23 +386,23 @@ class GatewayPay {
         let fields;
         let version;
         switch (func) {
-            case functions.createOnePayOrder:
+            case this.functions.createOnePayOrder:
                 fields = _.slice(reqParams.createPayOrder, 0, reqParams.createPayOrder.length);
                 version = 'v1.0';
                 break;
-            case functions.getOnePayOrder:
+            case this.functions.getOnePayOrder:
                 fields = _.slice(reqParams.getOnePayOrder, 0, reqParams.getOnePayOrder.length);
                 version = 'v1.5';
                 break;
-            case functions.batchGetPayOrders:
+            case this.functions.batchGetPayOrders:
                 fields = _.slice(reqParams.batchGetPayOrders, 0, reqParams.batchGetPayOrders.length);
                 version = 'v1.6';
                 break;
-            case functions.refundOnePayOrder:
+            case this.functions.refundOnePayOrder:
                 fields = _.slice(reqParams.refundOnePayOrder, 0, reqParams.refundOnePayOrder.length);
                 version = 'v2.3';
                 break;
-            case functions.getRefundStatus:
+            case this.functions.getRefundStatus:
                 fields = _.slice(reqParams.getRefundStatus, 0, reqParams.getRefundStatus.length);
                 version = 'v2.4';
         }
