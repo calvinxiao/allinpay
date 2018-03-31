@@ -229,7 +229,7 @@ class GatewayPay {
      * @returns {Promise.<{fields: Array, values: Array, postUrl: string}>}
      */
     getOnePayOrderParameters(data) {
-        const {fields, values} = this.sign(data, GatewayPay.functions.createOnePayOrder);
+        const {fields, values} = this.sign(data, this.functions.createOnePayOrder);
         return {
             fields: fields,
             values: values,
