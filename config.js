@@ -9,6 +9,9 @@ module.exports = {
         refundQuery: 'https://service.allinpay.com/mchtoq/refundQuery',
         // 账户支付
         accountPay: 'https://tlt.allinpay.com/aipg/ProcessServlet',
+        // 万鉴通
+        verifyBankCard3: 'https://openapi.allinpaycard.com/allinpay.bankcard.validate3keys/verify',
+        verifyBankCard4: 'https://openapi.allinpaycard.com/allinpay.bankcard.validate4keys/verify',
     },
     /**
      * 通联测试环境url

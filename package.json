@@ -1,6 +1,6 @@
 {
   "name": "allinpay",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Allinpay Node.js SDK 通联支付 Node.js SDK",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,7 @@
   "dependencies": {
     "iconv-lite": "^0.4.19",
     "lodash": "^4.17.5",
+    "node-rsa": "^0.4.2",
     "request": "^2.84.0",
     "request-promise": "^4.2.2",
     "xml2js": "^0.4.19"
