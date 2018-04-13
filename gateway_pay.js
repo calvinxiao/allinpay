@@ -156,23 +156,23 @@ const resParams = {
      * 支付回调
      */
     payCallback: [
-      'merchantId',
-      'version',
-      'language',
-      'signType',
-      'payType',
-      'issuerId',
-      'paymentOrderId',
-      'orderNo',
-      'orderDatetime',
-      'orderAmount',
-      'payDatetime',
-      'payAmount',
-      'ext1',
-      'ext1',
-      'payResult',
-      'errorCode',
-      'returnDatetime',
+        'merchantId',
+        'version',
+        'language',
+        'signType',
+        'payType',
+        'issuerId',
+        'paymentOrderId',
+        'orderNo',
+        'orderDatetime',
+        'orderAmount',
+        'payDatetime',
+        'payAmount',
+        'ext1',
+        'ext1',
+        'payResult',
+        'errorCode',
+        'returnDatetime',
     ]
 };
 
@@ -258,7 +258,9 @@ class GatewayPay {
         /**
          * 验签放在最后，因为报错的情况下，不用验签
          */
-        this.verifySignature(response, this.functions.getOnePayOrder);
+        if (!this.verifySignature(response, this.functions.getOnePayOrder)) {
+            throw new Error('验签不通过');
+        }
 
         return result;
     }
@@ -289,6 +291,9 @@ class GatewayPay {
 
     /**
      * 验证签名
+     * @param stringResult
+     * @param func
+     * @returns {boolean} 通过返回true
      */
     verifySignature(stringResult, func) {
         stringResult = decodeURI(stringResult);
@@ -322,9 +327,8 @@ class GatewayPay {
         }
 
         const calcSign = crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
-        if (signMsg !== calcSign) {
-            throw new Error(`验签不通过`);
-        }
+
+        return signMsg === calcSign;
     }
 
     /**
@@ -340,7 +344,9 @@ class GatewayPay {
             throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
 
-        this.verifySignature(response, this.functions.refundOnePayOrder);
+        if (!this.verifySignature(response, this.functions.refundOnePayOrder)) {
+            throw new Error('验签不通过');
+        }
 
         return result;
     }
@@ -358,7 +364,9 @@ class GatewayPay {
             throw new Error(`ERRORCODE: ${result.ERRORCODE}, ERRORMSG: ${result.ERRORMSG}`);
         }
 
-        this.verifySignature(response, this.functions.getRefundStatus);
+        if (!this.verifySignature(response, this.functions.getRefundStatus)) {
+            throw new Error('验签不通过');
+        }
 
         return result.results;
     }

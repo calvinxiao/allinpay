@@ -102,8 +102,7 @@ console.log(result);
 ```
 #### 验签
 ```javascript
-// 验签失败则throw Error
-verifySignature(stringResult, functions);
+const pass = verifySignature(stringResult, functions);
 /**
  functions取值：
  this.functions = {
