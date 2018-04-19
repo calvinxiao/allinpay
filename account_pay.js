@@ -7,7 +7,7 @@ const _ = require('lodash');
 const request = require('request');
 const crypto = require('crypto');
 const iconv = require('iconv-lite');
-const sign = crypto.createSign('RSA-SHA1');
+const signAlgorithm = 'RSA-SHA1';
 
 class AccountPay {
 
@@ -51,9 +51,9 @@ class AccountPay {
         const originStrBuffer = iconv.encode(originStr, 'gbk');
 
         // sign
-        sign.write(originStrBuffer);
-        sign.end();
-        const signature = sign.sign({key: this.privateCert, passphrase: this.certPassphrase}, 'hex');
+        const signature = crypto.createSign(signAlgorithm)
+          .update(originStrBuffer)
+          .sign({key: this.privateCert, passphrase: this.certPassphrase}, 'hex');
         obj.AIPG.INFO.SIGNED_MSG = signature;
 
         const signedXml = xml.builder.buildObject(obj);

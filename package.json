@@ -1,6 +1,6 @@
 {
   "name": "allinpay",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Allinpay Node.js SDK 通联支付 Node.js SDK",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com/calvinxiao/allinpay.git"
   },
-  "author": "Calvinxiao",
+  "author": "hjaurum@gmail.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/calvinxiao/allinpay/issues"
