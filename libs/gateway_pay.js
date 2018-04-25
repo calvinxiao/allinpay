@@ -2,8 +2,8 @@ const _ = require('lodash');
 const crypto = require('crypto');
 const request = require('request-promise');
 
-const config = require('./config');
-const utils = require('./utils');
+const config = require('../config');
+const utils = require('../utils');
 
 /**
  * 请求携带参数

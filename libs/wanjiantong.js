@@ -4,7 +4,7 @@
 const requestPromise = require('request-promise');
 const crypto = require('crypto');
 const sign = crypto.createSign('RSA-MD5');
-const config = require('./config');
+const config = require('../config');
 const NodeRSA = require('node-rsa');
 
 class Wanjiantong {

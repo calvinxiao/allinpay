@@ -1,8 +1,8 @@
 /**
  * Created by aurum on 2018/3/14.
  */
-const xml = require('./libs/XML');
-const config = require('./config');
+const xml = require('./XML');
+const config = require('../config');
 const _ = require('lodash');
 const request = require('request');
 const crypto = require('crypto');
