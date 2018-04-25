@@ -143,3 +143,16 @@ console.log(result);
 **/
 ```
 
+## 收银宝
+```javascript
+const shouyinbao = new Shouyinbao('商户号', 'appId', '交易密钥');
+```
+#### 创建支付
+```javascript
+// 仅三项必填，其他的视情况选填
+const result = await shouyinbao.createPayment({
+            trxamt: 100,
+            reqsn: '20060400000362813',
+            paytype: 'A01'
+        });
+```

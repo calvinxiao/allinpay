@@ -12,6 +12,8 @@ module.exports = {
         // 万鉴通
         verifyBankCard3: 'https://openapi.allinpaycard.com/allinpay.bankcard.validate3keys/verify',
         verifyBankCard4: 'https://openapi.allinpaycard.com/allinpay.bankcard.validate4keys/verify',
+        // 收银宝
+        pay: 'https://vsp.allinpay.com/apiweb/unitorder/pay',
     },
     /**
      * 通联测试环境url
