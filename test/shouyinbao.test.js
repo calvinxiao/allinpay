@@ -9,7 +9,7 @@ const shouyinbao = new Shouyinbao('1', '1', '1');
 
 describe('收银宝', function () {
     it('创建签名，ok', async () => {
-        const result = shouyinbao._getSignedBody({
+        const result = shouyinbao._getSignature({
             notify_url: 1,
             authcode: 1,
             body: 1,
@@ -29,14 +29,17 @@ describe('收银宝', function () {
     });
     it('创建支付，ok', async () => {
         const result = await shouyinbao.createPayment({
-            REQ_SN: '20060400000362813',
-        }, {
-            BUSINESS_CODE: '09100',
-            SUBMIT_TIME: '20180315132200',
-            ACCOUNT_NO: '6214857551853486',
-            ACCOUNT_NAME: '黄金',
-            ACCOUNT_PROP: '0',
-            AMOUNT: 20000,
+            trxamt: 1,
+            reqsn: '20060400000362815',
+            paytype: 'W01'
+        });
+        console.log(result);
+    });
+    it('交易撤销（全额退款），ok', async () => {
+        const result = await shouyinbao.cancel({
+            oldreqsn: '20060400000362815',
+            trxamt: 1,
+            reqsn: 'TK20060400000362815',
         });
         console.log(result);
     });

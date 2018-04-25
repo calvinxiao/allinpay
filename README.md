@@ -156,3 +156,11 @@ const result = await shouyinbao.createPayment({
             paytype: 'A01'
         });
 ```
+#### 撤销交易（仅限当天）
+```javascript
+const result = await shouyinbao.cancel({
+            oldreqsn: '20060400000362815',
+            trxamt: 1,
+            reqsn: 'TK20060400000362815',
+        });
+```

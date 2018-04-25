@@ -34,11 +34,44 @@ class Shouyinbao {
         options.sign = this._getSignature(options);
 
         const response = await request.post({
-            uri: config.PRODUCT_URL.pay,
+            uri: config.PRODUCT_URL.syb_pay,
             form: options,
             json: true,
         });
-        
+
+        if (response.retcode === 'FAIL') {
+            throw new Error(response.retmsg);
+        }
+        return response;
+    }
+
+    /**
+     * 交易撤销（仅限当天交易）
+     * @param options
+     * @returns {Promise.<*>}
+     */
+    async cancel(options) {
+        if (!options.trxamt || !options.reqsn) {
+            throw new Error('缺少参数');
+        }
+        if (!options.oldreqsn && !options.oldtrxid) {
+            throw new Error('oldreqsn和oldtrxid不能同时为空');
+        }
+
+        _.defaults(options, {
+            cusid: this.cusId,
+            appid: this.appId,
+            version: '11',
+            randomstr: crypto.randomBytes(8).toString('base64'),
+        });
+        options.sign = this._getSignature(options);
+
+        const response = await request.post({
+            uri: config.PRODUCT_URL.syb_cancel,
+            form: options,
+            json: true,
+        });
+
         if (response.retcode === 'FAIL') {
             throw new Error(response.retmsg);
         }
