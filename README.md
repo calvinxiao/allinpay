@@ -164,3 +164,17 @@ const result = await shouyinbao.cancel({
             reqsn: 'TK20060400000362815',
         });
 ```
+#### 交易退款（仅限第二天后）
+```javascript
+const result = await shouyinbao.refund({
+            oldreqsn: reqsn,
+            trxamt: 1,
+            reqsn: 'TK' + reqsn,
+        });
+```
+#### 交易查询
+```javascript
+const result = await shouyinbao.query({
+            reqsn,
+        });
+```
