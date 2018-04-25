@@ -111,6 +111,31 @@ class Shouyinbao {
         return response;
     }
 
+    async query(options) {
+        if (!options.reqsn) {
+            throw new Error('缺少参数');
+        }
+
+        _.defaults(options, {
+            cusid: this.cusId,
+            appid: this.appId,
+            version: '11',
+            randomstr: crypto.randomBytes(8).toString('base64'),
+        });
+        options.sign = this._getSignature(options);
+
+        const response = await request.post({
+            uri: config.PRODUCT_URL.syb_query,
+            form: options,
+            json: true,
+        });
+
+        if (response.retcode === 'FAIL') {
+            throw new Error(response.retmsg);
+        }
+        return response;
+    }
+
     /**
      * 获得签名
      * @param jsonObject 要传输的json对象

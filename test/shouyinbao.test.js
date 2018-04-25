@@ -52,4 +52,10 @@ describe('收银宝', function () {
         });
         console.log(result);
     });
+    it('交易查询，ok', async () => {
+        const result = await shouyinbao.query({
+            reqsn,
+        });
+        console.log(result);
+    });
 });
