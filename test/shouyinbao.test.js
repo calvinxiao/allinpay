@@ -27,19 +27,28 @@ describe('收银宝', function () {
         });
         console.log(result);
     });
+    const reqsn = '20060400000362818';
     it('创建支付，ok', async () => {
         const result = await shouyinbao.createPayment({
             trxamt: 1,
-            reqsn: '20060400000362815',
+            reqsn,
             paytype: 'W01'
         });
         console.log(result);
     });
     it('交易撤销（全额退款），ok', async () => {
         const result = await shouyinbao.cancel({
-            oldreqsn: '20060400000362815',
+            oldreqsn: reqsn,
             trxamt: 1,
-            reqsn: 'TK20060400000362815',
+            reqsn: 'TK' + reqsn,
+        });
+        console.log(result);
+    });
+    it('交易退款，ok', async () => {
+        const result = await shouyinbao.refund({
+            oldreqsn: reqsn,
+            trxamt: 1,
+            reqsn: 'TK' + reqsn,
         });
         console.log(result);
     });

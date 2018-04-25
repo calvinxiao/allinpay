@@ -15,6 +15,8 @@ module.exports = {
         // 收银宝
         syb_pay: 'https://vsp.allinpay.com/apiweb/unitorder/pay',
         syb_cancel: 'https://vsp.allinpay.com/apiweb/unitorder/cancel',
+        syb_refund: 'https://vsp.allinpay.com/apiweb/unitorder/refund',
+        syb_query: 'https://vsp.allinpay.com/apiweb/unitorder/query',
     },
     /**
      * 通联测试环境url
