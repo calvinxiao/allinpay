@@ -27,12 +27,13 @@ describe('收银宝', function () {
         });
         console.log(result);
     });
-    const reqsn = '20060400000362818';
+    const reqsn = '20060400000362820';
     it('创建支付，ok', async () => {
         const result = await shouyinbao.createPayment({
             trxamt: 1,
             reqsn,
-            paytype: 'W01'
+            paytype: 'W02',
+            acct: 'ofTT5wE2X8kEn1FvtRDARwegdXRE'
         });
         console.log(result);
     });

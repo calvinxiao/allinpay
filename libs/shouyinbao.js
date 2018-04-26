@@ -24,6 +24,9 @@ class Shouyinbao {
         if (!options.trxamt || !options.reqsn || !options.paytype) {
             throw new Error('缺少参数');
         }
+        if (['W02', 'A02'].includes(options.paytype) && !options.acct) {
+            throw new Error('缺少acct参数');
+        }
 
         _.defaults(options, {
             cusid: this.cusId,
@@ -33,6 +36,7 @@ class Shouyinbao {
         });
         options.sign = this._getSignature(options);
 
+        console.log(options);
         const response = await request.post({
             uri: config.PRODUCT_URL.syb_pay,
             form: options,
