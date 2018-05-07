@@ -143,6 +143,63 @@ console.log(result);
 **/
 ```
 
+#### 交易结果查询
+```javascript
+const result = await accountPay.queryResult({
+            REQ_SN: '2006040000036281',
+        }, {
+            QUERY_SN: '20060400000362813',
+        });
+console.log(result);
+/**
+* 打印结果：
+* { AIPG: 
+     { INFO: 
+        { TRX_CODE: '200004',
+          VERSION: '04',
+          DATA_TYPE: '2',
+          REQ_SN: '2006040000036281',
+          RET_CODE: '0000',
+          ERR_MSG: '处理完成@CChS',
+          SIGNED_MSG: '76b72925ae38ca040af9fe0ec7a931f361b6b6920be99eec6eea851ac3abf8fa80ba443c48646c054cf666386342595f6faa40783ce3278e557bae659b4d41c516b2502dfd6e8613b63fa8037aed7f78f82f15028fdbe1a01d455d3699d66fc27e7f7976ee753d76f2c104c9dc2451e73d32b457e45bad268d4f7164d3c407bed30e7c3b51e73f6ef4ee401be1001e7c506ea613b06912d201f4a74dbdd345a645503a5c436ddedffbee3df216a1932ed5a8e892ab17ece448f89d22ed570bfa23ca466a57acae54974c42da48be238381e2c00a5380740a1212fda374cd0c70e6c872a8e5a27ecc18906af255c9504a3fc1056bf1f3be518e9968fd49cf744c' },
+       QTRANSRSP: 
+            { QTDETAIL: 
+                        [ { BATCHID: '20060400000362813',
+                                     SN: '0',
+                                     TRXDIR: '0',
+                                     SETTDAY: '20180331',
+                                     FINTIME: '20180331162359',
+                                     SUBMITTIME: '20180331162358',
+                                     ACCOUNT_NO: '6214857451853486',
+                                     ACCOUNT_NAME: '黄金',
+                                     AMOUNT: '20000',
+                                     RET_CODE: '0000',
+                                     ERR_MSG: '处理成功' },
+                                   { BATCHID: '20060400000362813',
+                                     SN: '0',
+                                     TRXDIR: '0',
+                                     SETTDAY: '20180321',
+                                     FINTIME: '20180321143547',
+                                     SUBMITTIME: '20180321143547',
+                                     ACCOUNT_NO: '6214857451853485',
+                                     ACCOUNT_NAME: '黄金',
+                                     AMOUNT: '20000',
+                                     RET_CODE: '0000',
+                                     ERR_MSG: '处理成功' },
+                                   { BATCHID: '20060400000362813',
+                                     SN: '0',
+                                     TRXDIR: '0',
+                                     SETTDAY: '20180329',
+                                     FINTIME: '20180329173214',
+                                     SUBMITTIME: '20180329173214',
+                                     ACCOUNT_NO: '6214857451853486',
+                                     ACCOUNT_NAME: '黄金',
+                                     AMOUNT: '20000',
+                                     RET_CODE: '0000',
+                                     ERR_MSG: '处理成功' } ] } } }
+*/
+```
+
 ## 收银宝
 ```javascript
 const shouyinbao = new Shouyinbao('商户号', 'appId', '交易密钥');

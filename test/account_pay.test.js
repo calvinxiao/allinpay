@@ -21,4 +21,14 @@ describe('账户支付', function () {
         });
         console.log(result);
     });
+
+    it('交易结果查询，ok', async () => {
+        const result = await accountPay.queryResult({
+            REQ_SN: '2006040000036281',
+        }, {
+            QUERY_SN: '20060400000362813',
+        });
+        console.log(result);
+        console.log(result.AIPG.QTRANSRSP);
+    });
 });
