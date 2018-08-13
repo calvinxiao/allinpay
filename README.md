@@ -9,6 +9,8 @@ npm install allinpay
 const AllInPay = require('allinpay');
 const GateWayPay = AllInPay.GatewayPay; // 网关支付
 const AccountPay = AllInPay.AccountPay; // 账户支付
+const Shouyinbao = AllInPay.Shouyinbao; // 收银宝（移动支付）
+const Wanjiantong = AllInPay.Wanjiantong; // 万鉴通（银行卡要素验证）
 ```
 ## 网关支付
 
@@ -234,4 +236,38 @@ const result = await shouyinbao.refund({
 const result = await shouyinbao.query({
             reqsn,
         });
+```
+
+## 收银宝
+```javascript
+const shouyinbao = new Shouyinbao('商户号', 'app id','app key');
+
+// 以后的调用中都不需要传以上参数
+```
+####
+文档来不及写，方法使用请见单元测试文件
+
+## 万鉴通
+
+```javascript
+const privateCert = `-----BEGIN PRIVATE KEY-----
+MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBALTsL8OFMhtfK0aoYwV
+wQXpqQoGQBHXQo4NTEVc+Wn9vgB8FMSolvrQGncBi/ty7c9jBqoVfhu+DqHRP7DB4Qf
+1+gmzZU1SRvIJUewpovGTi/htJnLcm9R4pFC79VqhTquHBaSTz00P8nI5zGPpxXaIf5
+DPI7MbRjLatDZ1TikFjAgMBAAECgYEAqHHSEo67VSKpLxLtho26WNf/7ZMBpBNJeaZo
+lx1aLRllEBuJpTcapptaQJBAKds4f7dWsKLPdNfCNtX9bB2IC7dNkX65LcUV2BrgqIn
+gnyvDPGm2V0ZAHcThm0J1QogwifzbeMjenokPYUVhf0=
+-----END PRIVATE KEY-----`;
+
+const wanjiantong = new Wanjiantong('机构号生成的key（见通联文档生成方式或者直接找通联要）', 'merchatId', privateCert);
+
+```
+#### 要素验证（包括三要素、四要素）
+```javascript
+const result = await wanjiantong.verifyBankCard({
+            name: '黄金',
+            bankCard: '621485755185',
+            idNumber: '51010619940323',
+            phone: '1868230', // 如果是四要素验证才传phone
+            });
 ```
