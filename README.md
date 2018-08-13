@@ -238,15 +238,6 @@ const result = await shouyinbao.query({
         });
 ```
 
-## 收银宝
-```javascript
-const shouyinbao = new Shouyinbao('商户号', 'app id','app key');
-
-// 以后的调用中都不需要传以上参数
-```
-####
-文档来不及写，方法使用请见单元测试文件
-
 ## 万鉴通
 
 ```javascript
