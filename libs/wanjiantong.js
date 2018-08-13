@@ -3,7 +3,6 @@
  */
 const requestPromise = require('request-promise');
 const crypto = require('crypto');
-const sign = crypto.createSign('RSA-MD5');
 const config = require('../config');
 const NodeRSA = require('node-rsa');
 
@@ -61,6 +60,7 @@ class Wanjiantong {
     }
 
     getSignature(paramJson) {
+        const sign = crypto.createSign('RSA-MD5');
         sign.write(JSON.stringify(paramJson));
         sign.end();
         const signature = sign.sign(this.privateKey, 'base64');
