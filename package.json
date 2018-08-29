@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/calvinxiao/allinpay.git"
+    "url": "git+ssh://git@github.com:hjaurum/allinpay.git"
   },
   "author": "hjaurum@gmail.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/calvinxiao/allinpay/issues"
+    "url": "https://github.com/hjaurum/allinpay/issues"
   },
-  "homepage": "https://github.com/calvinxiao/allinpay#readme",
+  "homepage": "https://github.com/hjaurum/allinpay#readme",
   "dependencies": {
     "iconv-lite": "^0.4.19",
     "lodash": "^4.17.5",
